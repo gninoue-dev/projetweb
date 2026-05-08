@@ -1,0 +1,48 @@
+<?php
+session_start();
+include("includes/db.php");
+
+// Vérifier que l'utilisateur est connecté et qu'il est étudiant
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'etudiant') {
+    header("Location: index.php");
+    exit();
+}
+
+$id_user = $_SESSION['user_id'];
+
+// Récupérer l'examen en cours (exemple : le premier examen disponible)
+$sql_exam = "SELECT * FROM examens ORDER BY date_exam LIMIT 1";
+$result_exam = mysqli_query($conn, $sql_exam);
+$exam = mysqli_fetch_assoc($result_exam);
+
+// Récupérer les questions de cet examen
+$sql_questions = "SELECT * FROM questions WHERE id_exam='".$exam['id_exam']."'";
+$result_questions = mysqli_query($conn, $sql_questions);
+?>
+
+<h2>Examen : <?php echo $exam['titre']; ?></h2>
+<p><?php echo $exam['description']; ?></p>
+<p>Date : <?php echo $exam['date_exam']; ?> | Durée : <?php echo $exam['duree']; ?> minutes</p>
+
+<!-- Chronomètre -->
+<div id="timer"></div>
+<script src="js/timer.js"></script>
+
+<form method="POST" action="soumettre.php">
+  <?php while($q = mysqli_fetch_assoc($result_questions)) { ?>
+    <div>
+      <p><b>Question <?php echo $q['id_question']; ?> :</b> <?php echo $q['contenu']; ?></p>
+      <?php if ($q['type'] == 'QCM') { ?>
+        <input type="text" name="reponse[<?php echo $q['id_question']; ?>]" placeholder="Votre réponse (A/B/C/D)">
+      <?php } elseif ($q['type'] == 'Texte') { ?>
+        <textarea name="reponse[<?php echo $q['id_question']; ?>]"></textarea>
+      <?php } else { ?>
+        <select name="reponse[<?php echo $q['id_question']; ?>]">
+          <option value="Vrai">Vrai</option>
+          <option value="Faux">Faux</option>
+        </select>
+      <?php } ?>
+    </div>
+  <?php } ?>
+  <button type="submit">Soumettre mes réponses</button>
+</form>
