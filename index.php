@@ -1,44 +1,64 @@
 <?php
-session_start();
-include("includes/db.php");
-include("includes/header.php");
-include("includes/footer.php");
-include("includes/functions.php");
-
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $identifiant = $_POST['identifiant']; // peut être email ou matricule
-    $mot_de_passe = $_POST['mot_de_passe'];
-
-    // Vérifier si l'identifiant correspond à un email ou un matricule
-    $sql = "SELECT * FROM utilisateurs WHERE email='$identifiant' OR matricule='$identifiant'";
-    $result = mysqli_query($conn, $sql);
-    $user = mysqli_fetch_assoc($result);
-
-    if ($user && password_verify($mot_de_passe, $user['mot_de_passe'])) {
-        // Création de la session
-        $_SESSION['user_id'] = $user['id_user'];
-        $_SESSION['role'] = $user['role'];
-        $_SESSION['nom'] = $user['nom'];
-        $_SESSION['prenom'] = $user['prenom'];
-
-        // Redirection selon rôle
-        if ($user['role'] == 'etudiant') {
-            header("Location: examen.php");
-        } elseif ($user['role'] == 'examinateur') {
-            header("Location: dashboard.php");
+require_once 'config.php';
+if (isLoggedIn()) {
+    $redirect = $_SESSION['user_role'] === 'examinateur' ? 'dashboard_examinateur.php' : 'dashboard_etudiant.php';
+    header('Location: ' . BASE_URL . $redirect);
+    exit;
+}
+$error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = trim($_POST['email'] ?? '');
+    $mdp   = $_POST['mot_de_passe'] ?? '';
+    if ($email && $mdp) {
+        $stmt = $pdo->prepare("SELECT * FROM utilisateurs WHERE email = ?");
+        $stmt->execute([$email]);
+        $user = $stmt->fetch();
+        if ($user && password_verify($mdp, $user['mot_de_passe'])) {
+            $_SESSION['user_id']   = $user['id'];
+            $_SESSION['user_nom']  = $user['prenom'] . ' ' . $user['nom'];
+            $_SESSION['user_role'] = $user['role'];
+            $redirect = $user['role'] === 'examinateur' ? 'dashboard_examinateur.php' : 'dashboard_etudiant.php';
+            header('Location: ' . BASE_URL . $redirect);
+            exit;
         } else {
-            header("Location: dashboard.php"); // admin aussi
+            $error = "Email ou mot de passe incorrect.";
         }
     } else {
-        echo "❌ Identifiants incorrects.";
+        $error = "Veuillez remplir tous les champs.";
     }
 }
 ?>
-
-<!-- Formulaire HTML -->
-<form method="POST">
-  Email ou Matricule: <input type="text" name="identifiant" required><br>
-  Mot de passe: <input type="password" name="mot_de_passe" required><br>
-  <button type="submit">Connexion</button>
-</form>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExamSecure – Connexion</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-page">
+<div class="login-container">
+    <div class="login-logo">
+        <div class="logo-icon"><i class="fa-solid fa-clipboard"></i></div>
+        <h1>ExamSecure</h1>
+        <p>Plateforme d'examen sécurisée</p>
+    </div>
+    <?php if ($error): ?>
+    <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+    <?php endif; ?>
+    <form method="POST" class="login-form">
+        <div class="form-group">
+            <label for="email">Adresse email</label>
+            <input type="email" id="email" name="email" placeholder="votre@email.com" required autofocus>
+        </div>
+        <div class="form-group">
+            <label for="mot_de_passe">Mot de passe</label>
+            <input type="password" id="mot_de_passe" name="mot_de_passe" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Se connecter</button>
+    </form>
+    <p class="login-hint">Examinateur : exam@test.com / password<br>Étudiant : etudiant@test.com / password</p>
+</div>
+</body>
+</html>

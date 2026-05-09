@@ -1,26 +1,43 @@
 <?php
-session_start();
-include("includes/db.php");
-include("includes/header.php");
-include("includes/footer.php");
-include("includes/functions.php");
-// Vérifier que l'utilisateur est étudiant
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'etudiant') {
-    header("Location: index.php");
-    exit();
-}
-
-$id_user = $_SESSION['user_id'];
-$id_exam = $_GET['id_exam'];
-
-// Réception des anomalies envoyées par JS
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $type_anomalie = $_POST['type_anomalie'];
-
-    $sql = "INSERT INTO anomalies (id_user, id_exam, type_anomalie) 
-            VALUES ('$id_user','$id_exam','$type_anomalie')";
-    mysqli_query($conn, $sql);
-
-    echo "✅ Anomalie enregistrée.";
+require_once 'config.php';
+require_once 'includes/auth.php';
+if (!isLoggedIn() || $_SESSION['user_role'] !== 'examinateur') {
+    header('Location: ' . BASE_URL . 'index.php');
+    exit;
 }
 ?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Surveillance Examen</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <?php include 'includes/header.php'; ?>
+    <div class="container">
+        <div class="page-header">
+            <h2><i class="fa-solid fa-binoculars"></i> Surveillance Examen</h2>
+        </div>
+        <div class="two-cols">
+            <div>
+                <div class="section-title">Candidats en ligne</div>
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fa-solid fa-users"></i></div>
+                    <h3>Aucun candidat</h3>
+                </div>
+            </div>
+            <div>
+                <div class="section-title">Anomalies détectées</div>
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="fa-solid fa-check-circle"></i></div>
+                    <h3>Aucune anomalie</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php include 'includes/footer.php'; ?>
+</body>
+</html>

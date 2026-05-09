@@ -1,27 +1,21 @@
-// timer.js : compte à rebours côté client
-
-function startTimer(duration, display) {
-    let timer = duration, minutes, seconds;
-    let countdown = setInterval(function () {
-        minutes = parseInt(timer / 60, 10);
-        seconds = parseInt(timer % 60, 10);
-
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-
-        display.textContent = minutes + ":" + seconds;
-
-        if (--timer < 0) {
-            clearInterval(countdown);
-            alert("⏳ Temps écoulé ! Vos réponses vont être soumises.");
-            window.location.href = "confirmation.php"; // redirection auto
+(function() {
+    const timerEl = document.getElementById('timer');
+    if (!timerEl) return;
+    function updateTimer() {
+        const elapsed = Math.floor((Date.now() - START_TIME) / 1000);
+        const remaining = DUREE_SEC - elapsed;
+        if (remaining <= 0) {
+            timerEl.textContent = '00:00';
+            timerEl.style.color = '#E24B4A';
+            document.getElementById('examForm').submit();
+            return;
         }
-    }, 1000);
-}
-
-// Initialisation automatique
-window.onload = function () {
-    let examDuration = 30 * 60; // 30 minutes en secondes
-    let display = document.querySelector('#time');
-    startTimer(examDuration, display);
-};
+        const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+        const s = (remaining % 60).toString().padStart(2, '0');
+        timerEl.textContent = m + ':' + s;
+        if (remaining < 300) timerEl.style.color = '#EF9F27';
+        if (remaining < 60)  timerEl.style.color = '#E24B4A';
+    }
+    updateTimer();
+    setInterval(updateTimer, 1000);
+})();

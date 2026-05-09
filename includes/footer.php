@@ -1,6 +1,3 @@
-  </main>
-  <footer>
-    <p>&copy; 2026 Plateforme Examens – Tous droits réservés</p>
-  </footer>
-</body>
-</html>
+<footer class="main-footer">
+    <p>ExamSecure &copy; <?= date('Y') ?> – Plateforme d'examen sécurisée</p>
+</footer>

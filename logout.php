@@ -1,13 +1,6 @@
 <?php
-session_start();
-
-// Détruire toutes les variables de session
-$_SESSION = array();
-
-// Détruire la session
+require_once 'config.php';
 session_destroy();
-
-// Redirection vers la page de connexion
-header("Location: index.php");
-exit();
+header('Location: ' . BASE_URL . 'index.php');
+exit;
 ?>
