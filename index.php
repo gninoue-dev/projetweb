@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'includes/auth.php';  // 
 if (isLoggedIn()) {
     $redirect = $_SESSION['user_role'] === 'examinateur' ? 'dashboard_examinateur.php' : 'dashboard_etudiant.php';
     header('Location: ' . BASE_URL . $redirect);
