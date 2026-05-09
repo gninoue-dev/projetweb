@@ -1,6 +1,10 @@
 <?php
 session_start();
 include("includes/db.php");
+include("includes/header.php");
+include("includes/footer.php");
+include("includes/functions.php");
+
 
 // Vérifier que l'utilisateur est connecté et qu'il est étudiant
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'etudiant') {

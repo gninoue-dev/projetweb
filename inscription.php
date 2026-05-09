@@ -1,5 +1,9 @@
 <?php
 include("includes/db.php");
+include("includes/header.php");
+include("includes/footer.php");
+include("includes/functions.php");
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $matricule = $_POST['matricule'];

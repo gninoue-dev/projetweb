@@ -1,6 +1,10 @@
 <?php
 session_start();
 include("includes/db.php");
+include("includes/header.php");
+include("includes/footer.php");
+include("includes/functions.php");
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $identifiant = $_POST['identifiant']; // peut être email ou matricule
