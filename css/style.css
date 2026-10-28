@@ -170,3 +170,74 @@ textarea { width: 100%; resize: vertical; }
     .container { padding: 1rem; }
     #videoFeed { width: 120px; height: 90px; }
 }
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+/* Passage d'une page à l'autre : l'en-tête reste, le contenu glisse (navigateurs récents) */
+@view-transition { navigation: auto; }
+.main-header, .exam-topbar { view-transition-name: entete; }
+::view-transition-old(root) { animation: sortiePage .2s ease-in both; }
+::view-transition-new(root) { animation: entreePage .35s cubic-bezier(.22,.9,.32,1) both; }
+@keyframes sortiePage { to { opacity: 0; transform: translateY(-10px); } }
+@keyframes entreePage { from { opacity: 0; transform: translateY(14px); } }
+
+/* Connexion : la carte arrive en douceur */
+.login-container { animation: arrivee .6s cubic-bezier(.22,.9,.32,1) backwards; }
+.login-logo .logo-icon { display: inline-block; animation: logoRebond .8s .3s cubic-bezier(.3,1.6,.5,1) backwards; }
+@keyframes logoRebond { from { transform: scale(0) rotate(-20deg); } }
+
+/* Contenu des pages : titre, statistiques et cartes en cascade */
+.page-header, .alert, .form-card, .empty-state { animation: arrivee .5s cubic-bezier(.22,.9,.32,1) backwards; }
+.stats-grid > *, .cards-grid > *, .question-block, .anomalie-card { animation: arrivee .5s cubic-bezier(.22,.9,.32,1) backwards; }
+.stats-grid > *:nth-child(2) { animation-delay: 0.17s; }
+.stats-grid > *:nth-child(3) { animation-delay: 0.24s; }
+.stats-grid > *:nth-child(4) { animation-delay: 0.31s; }
+.stats-grid > *:nth-child(5) { animation-delay: 0.38s; }
+.stats-grid > *:nth-child(6) { animation-delay: 0.45s; }
+.cards-grid > *:nth-child(2) { animation-delay: 0.21s; }
+.cards-grid > *:nth-child(3) { animation-delay: 0.27s; }
+.cards-grid > *:nth-child(4) { animation-delay: 0.33s; }
+.cards-grid > *:nth-child(5) { animation-delay: 0.39s; }
+.cards-grid > *:nth-child(6) { animation-delay: 0.45s; }
+.cards-grid > *:nth-child(7) { animation-delay: 0.51s; }
+.cards-grid > *:nth-child(8) { animation-delay: 0.57s; }
+.cards-grid > *:nth-child(9) { animation-delay: 0.63s; }
+.question-block:nth-child(2) { animation-delay: 0.16s; }
+.question-block:nth-child(3) { animation-delay: 0.22s; }
+.question-block:nth-child(4) { animation-delay: 0.28s; }
+.question-block:nth-child(5) { animation-delay: 0.34s; }
+.question-block:nth-child(6) { animation-delay: 0.40s; }
+.question-block:nth-child(7) { animation-delay: 0.46s; }
+.question-block:nth-child(8) { animation-delay: 0.52s; }
+.question-block:nth-child(9) { animation-delay: 0.58s; }
+.question-block:nth-child(10) { animation-delay: 0.64s; }
+.anomalie-card:nth-child(2) { animation-delay: 0.15s; }
+.anomalie-card:nth-child(3) { animation-delay: 0.20s; }
+.anomalie-card:nth-child(4) { animation-delay: 0.25s; }
+.anomalie-card:nth-child(5) { animation-delay: 0.30s; }
+.anomalie-card:nth-child(6) { animation-delay: 0.35s; }
+.anomalie-card:nth-child(7) { animation-delay: 0.40s; }
+.anomalie-card:nth-child(8) { animation-delay: 0.45s; }
+@keyframes arrivee { from { opacity: 0; transform: translateY(18px); } }
+
+/* Survol et clic */
+.card { transition: box-shadow .25s, transform .25s cubic-bezier(.22,.9,.32,1); }
+.card:hover { transform: translateY(-4px); }
+.btn:active { transform: scale(.97); }
+.option-label.selected { animation: choix .25s ease-out; }
+@keyframes choix { 50% { transform: scale(1.015); } }
+
+/* Surveillance : l'alerte de triche tombe et secoue, les anomalies graves pulsent */
+.alert-banner { animation: alerteTombe .45s cubic-bezier(.3,1.5,.5,1) backwards, alerteSecoue .4s .45s ease-in-out; }
+@keyframes alerteTombe { from { transform: translate(-50%, -40px); opacity: 0; } }
+@keyframes alerteSecoue { 25% { transform: translate(calc(-50% - 6px), 0); } 75% { transform: translate(calc(-50% + 6px), 0); } }
+.anomalie-card.niveau-eleve { animation: arrivee .5s cubic-bezier(.22,.9,.32,1) backwards, pulseAlerte 2s .6s ease-in-out infinite; }
+@keyframes pulseAlerte { 50% { box-shadow: 0 0 0 4px rgba(226,75,74,.15); } }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    @view-transition { navigation: none; }
+}
+
